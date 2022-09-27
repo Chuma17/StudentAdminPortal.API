@@ -21,8 +21,8 @@ namespace StudentAdminPortal.API.Controllers
         [Route("[controller]")]
         public async Task<IActionResult> GetAllStudents()
         {
-            var students = await _studentRepository.GetStudentsAsync();            
-                        
+            var students = await _studentRepository.GetStudentsAsync();
+
             return Ok(_mapper.Map<List<StudentDto>>(students));
         }
 
@@ -40,5 +40,26 @@ namespace StudentAdminPortal.API.Controllers
             }
             return Ok(_mapper.Map<StudentDto>(student));
         }
+
+        [HttpPut]
+        [Route("[controller]/{studentId:guid}")]
+        //UpdateStudentRequest is the object containing all the properties that the user will be allowed to change
+        public async Task<IActionResult> UpdateStudentAsync([FromRoute] Guid studentId, [FromBody] UpdateStudentRequest request)
+        {
+            if (await _studentRepository.Exists(studentId))
+            {
+                //Update Details
+                var updatedStudent = await _studentRepository.UpdateStudent(studentId, _mapper.Map<Student>(request));
+
+                if (updatedStudent != null)
+                {
+                    return Ok(_mapper.Map<Student>(updatedStudent));
+                }
+            }
+
+            return NotFound();
+
+        }
+
     }
 }
